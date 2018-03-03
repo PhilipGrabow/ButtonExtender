@@ -40,11 +40,13 @@ public class Main extends JavaPlugin implements Listener {
 					Button button = new Button(Material.WOOD_BUTTON, block.getData());
 					button.setPowered(true);
 					block.setData(button.getData());
+					e.getPlayer().sendMessage("Der Button wurde aktiviert er schaltet sich nach 10 Sekunden aus!");
 					i =Bukkit.getScheduler().scheduleSyncDelayedTask(this, new Runnable() {
 
 						@Override
 						public void run() {
 							button.setPowered(false);
+							e.getPlayer().sendMessage("Button wurde abgeschaltet!");
 							block.setData(button.getData());
 							return;
 						}
@@ -54,6 +56,7 @@ public class Main extends JavaPlugin implements Listener {
 				if(btn.isPowered() == true) {
 					Button button = new Button(Material.WOOD_BUTTON, block.getData());
 					button.setPowered(false);
+					e.getPlayer().sendMessage("Befehl abgebrochen!!");
 					block.setData(button.getData());
 					Bukkit.getScheduler().cancelTask(i);
 					return;
