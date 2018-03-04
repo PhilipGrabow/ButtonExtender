@@ -1,20 +1,32 @@
 package de.philipgrabow.buttonextender;
 
+import java.io.File;
+import java.util.HashMap;
 import java.util.logging.Level;
 
 import org.bukkit.Bukkit;
-import org.bukkit.Material;
-import org.bukkit.block.Block;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.EventPriority;
+import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.event.Listener;
-import org.bukkit.event.block.Action;
-import org.bukkit.event.player.PlayerInteractEvent;
-import org.bukkit.material.Button;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import de.philipgrabow.buttonextender.executor.BtnCreateCmd;
+import de.philipgrabow.buttonextender.executor.BtnRemoveCmd;
+import de.philipgrabow.buttonextender.listener.BtnClick;
+
 public class Main extends JavaPlugin implements Listener {
+	
+	public static File file = new File("plugins/ButtonExtender/Buttons", "Button.yml");
+	public static FileConfiguration cfg = YamlConfiguration.loadConfiguration(file);
+	
+//	HashMap zur Aktivierung der Button-Erkennung
+//	Key: SpielerName Value: ButtonName
+	public static HashMap<String, String> map = new HashMap<String, String>();
+	
+//	HashMap zur Aktivierung des Entfernen-Modus für Buttons
+//	Key: SpielerName Value: ButtonName
+	public static HashMap<String, String> map2 = new HashMap<String, String>();
 
 	@Override
 	public void onDisable() {
@@ -23,50 +35,14 @@ public class Main extends JavaPlugin implements Listener {
 
 	@Override
 	public void onEnable() {
+		
+		getCommand("btnadd").setExecutor(new BtnCreateCmd());
+		getCommand("btndel").setExecutor(new BtnRemoveCmd());
+//		getCommand("btncheck").setExecutor(new BtnCheckCmd());
+		
+		
 		PluginManager pm = Bukkit.getPluginManager();
-		pm.registerEvents(this, this);
+		pm.registerEvents(new BtnClick(this), this);
 		this.getLogger().log(Level.INFO, "enabled!");
 	}
-	
-	@SuppressWarnings("deprecation")
-	@EventHandler(priority = EventPriority.NORMAL)
-	public void onBtnClick(PlayerInteractEvent e) {
-		if(e.getAction() == Action.RIGHT_CLICK_BLOCK) {	
-			if(e.getClickedBlock().getType() == Material.WOOD_BUTTON ) {
-				int i = 0;
-				Block block = e.getClickedBlock();
-				Button btn = (Button)block.getState().getData();
-				if(btn.isPowered() == false) {
-					Button button = new Button(Material.WOOD_BUTTON, block.getData());
-					button.setPowered(true);
-					block.setData(button.getData());
-					e.getPlayer().sendMessage("Der Button wurde aktiviert er schaltet sich nach 10 Sekunden aus!");
-					i =Bukkit.getScheduler().scheduleSyncDelayedTask(this, new Runnable() {
-
-						@Override
-						public void run() {
-							button.setPowered(false);
-							e.getPlayer().sendMessage("Button wurde abgeschaltet!");
-							block.setData(button.getData());
-							return;
-						}
-						
-					}, 200);
-				}
-				if(btn.isPowered() == true) {
-					Button button = new Button(Material.WOOD_BUTTON, block.getData());
-					button.setPowered(false);
-					e.getPlayer().sendMessage("Befehl abgebrochen!!");
-					block.setData(button.getData());
-					Bukkit.getScheduler().cancelTask(i);
-					return;
-				}
-			}
-			return;
-		}
-		return;
-	}
-	
-	
-
 }

@@ -1,7 +1,13 @@
 name: ButtonExtender
-version: 0.0.1
+version: 0.0.3
 author: PhilipGrabow
 
 main: de.philipgrabow.buttonextender.Main
 
-
+commands:
+  btnadd:
+    description: Aktivierungsmodus Button
+    usage: /<command> (name)
+  btndel:
+    description: Entfernt Buttons aus der Liste
+    usage: /<command>
